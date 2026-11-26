@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Tiktok</title>
+<title>Quickdraw Quiver</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; }
@@ -20,6 +20,56 @@
     aspect-ratio: 16 / 9;
   }
   canvas { width: 100%; height: 100%; display: block; cursor: crosshair; touch-action: none; }
+
+  /* ---------- Startup screen ---------- */
+  #startScreen {
+    position: absolute;
+    inset: 0;
+    z-index: 500;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    background: linear-gradient(rgba(15,35,20,.45),rgba(15,35,20,.78));
+    color: white;
+  }
+  #startScreen.hidden { display: none; }
+  .startCard {
+    width: min(80%, 600px);
+    padding: 5%;
+    background: rgba(30,55,30,.92);
+    border: 3px solid #d4af37;
+    border-radius: 25px;
+    box-shadow: 0 0 35px rgba(212,175,55,.35);
+  }
+  .startCard h1 {
+    font-size: clamp(35px,7vw,80px);
+    color: #f4d35e;
+    text-shadow: 3px 3px 0 #3c5227;
+    margin-bottom: .2em;
+  }
+  .startCard p {
+    font-size: clamp(14px,2.5vw,25px);
+    margin-bottom: 1.5em;
+    color: #f5f5dc;
+  }
+  #playBtn {
+    padding: .7em 2em;
+    border: 2px solid #f4d35e;
+    border-radius: 999px;
+    background: #5b8c35;
+    color: white;
+    font: bold clamp(18px,3vw,30px) Georgia,serif;
+    cursor: pointer;
+    transition: transform .2s, background .2s;
+  }
+  #playBtn:hover {
+    transform: scale(1.08);
+    background: #79a847;
+  }
+  #playBtn:focus-visible {
+    outline: 3px solid white;
+    outline-offset: 3px;
+  }
 
   #muteBtn {
     position: fixed;
@@ -39,7 +89,7 @@
   }
   #muteBtn:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 
-  /* ---------- Message card (after the transition) ---------- */
+  /* ---------- Message card ---------- */
   #popup {
     position: absolute;
     inset: 0;
@@ -60,7 +110,7 @@
     animation: pop .8s cubic-bezier(.2, 1.7, .4, 1) both;
   }
   .card h1 { font-size: clamp(26px, 5.5vw, 64px); margin-bottom: .3em; }
-  .card p  { font-size: clamp(16px, 2.8vw, 34px); line-height: 1.35; }
+  .card p { font-size: clamp(16px, 2.8vw, 34px); line-height: 1.35; }
   .btn {
     margin-top: 1.2em;
     padding: .55em 1.4em;
@@ -74,7 +124,7 @@
   .btn:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
   @keyframes pop {
     from { transform: scale(0) rotate(-10deg); opacity: 0; }
-    to   { transform: scale(1) rotate(0);      opacity: 1; }
+    to { transform: scale(1) rotate(0); opacity: 1; }
   }
 
   /* ---------- Letter screen ---------- */
@@ -88,7 +138,6 @@
     background: radial-gradient(circle at 50% 40%, #5a1238, #12040c 75%);
   }
   #letter.show { display: grid; }
-
   .bg-heart {
     position: fixed;
     bottom: -40px;
@@ -98,26 +147,31 @@
     pointer-events: none;
   }
   @keyframes rise {
-    0%   { transform: translateY(0); opacity: 0; }
-    10%  { opacity: .6; }
+    0% { transform: translateY(0); opacity: 0; }
+    10% { opacity: .6; }
     100% { transform: translateY(-115vh); opacity: 0; }
   }
-
   .envelope {
     position: absolute;
     width: min(320px, 80vw);
     aspect-ratio: 3 / 2;
     animation: envelope 3s ease-in-out forwards;
   }
-  .env-back  { position: absolute; inset: 0; background: #e6c79c; border-radius: 6px; }
+  .env-back { position: absolute; inset: 0; background: #e6c79c; border-radius: 6px; }
   .env-front {
-    position: absolute; inset: 0; border-radius: 6px;
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
     background: #f1d9b3;
     clip-path: polygon(0 0, 50% 55%, 100% 0, 100% 100%, 0 100%);
     z-index: 2;
   }
   .flap {
-    position: absolute; top: 0; left: 0; width: 100%; height: 55%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 55%;
     background: #d9b88a;
     clip-path: polygon(0 0, 100% 0, 50% 100%);
     transform-origin: top;
@@ -125,25 +179,28 @@
     animation: flap 1s .6s ease-in-out forwards;
   }
   .seal {
-    position: absolute; left: 50%; top: 42%;
+    position: absolute;
+    left: 50%;
+    top: 42%;
     transform: translate(-50%, -50%);
-    color: #c4124d; font-size: 34px; z-index: 4;
+    color: #c4124d;
+    font-size: 34px;
+    z-index: 4;
     animation: sealOut .3s .6s forwards;
   }
   @keyframes envelope {
-    0%   { opacity: 0; transform: translateY(20px); }
-    15%  { opacity: 1; transform: translateY(0); }
-    75%  { opacity: 1; transform: translateY(0); }
+    0% { opacity: 0; transform: translateY(20px); }
+    15% { opacity: 1; transform: translateY(0); }
+    75% { opacity: 1; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(70px); }
   }
   @keyframes flap {
-    0%   { transform: scaleY(1);  z-index: 3; }
-    49%  { transform: scaleY(0);  z-index: 3; }
-    50%  { z-index: 0; }
+    0% { transform: scaleY(1); z-index: 3; }
+    49% { transform: scaleY(0); z-index: 3; }
+    50% { z-index: 0; }
     100% { transform: scaleY(-1); z-index: 0; }
   }
   @keyframes sealOut { to { opacity: 0; } }
-
   .paper {
     position: relative;
     width: min(560px, 92vw);
@@ -161,18 +218,28 @@
   }
   @keyframes paperIn {
     from { opacity: 0; transform: translateY(50px) scale(.7); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
   }
   .paper h2 { font-size: 1.8rem; font-style: italic; margin-bottom: 16px; }
-  .paper p  { font-size: 1.08rem; line-height: 32px; margin-bottom: 14px; }
-  .paper .sign { margin-top: 18px; font-style: italic; font-size: 1.2rem; line-height: 1.5; white-space: pre-line; }
+  .paper p { font-size: 1.08rem; line-height: 32px; margin-bottom: 14px; }
+  .paper .sign {
+    margin-top: 18px;
+    font-style: italic;
+    font-size: 1.2rem;
+    line-height: 1.5;
+    white-space: pre-line;
+  }
   .paper .link {
-    display: block; margin: 22px auto 0;
-    background: none; border: 0; color: #b00c4c;
-    font: 15px Georgia, serif; text-decoration: underline; cursor: pointer;
+    display: block;
+    margin: 22px auto 0;
+    background: none;
+    border: 0;
+    color: #b00c4c;
+    font: 15px Georgia, serif;
+    text-decoration: underline;
+    cursor: pointer;
   }
   .paper .link:focus-visible { outline: 2px solid #b00c4c; outline-offset: 3px; }
-
   .paper .btn {
     display: block;
     margin: 24px auto 0;
@@ -180,7 +247,7 @@
     color: #fff;
   }
 
-  /* ---------- Black screen: "I love you" in 20 languages ---------- */
+  /* ---------- Finale ---------- */
   #finale {
     position: fixed;
     inset: 0;
@@ -192,7 +259,6 @@
   }
   #finale.show { display: flex; animation: fadeIn 1.2s both; }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
   #finaleCanvas { width: 100%; height: 100%; display: block; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -207,6 +273,15 @@
 
 <div class="wrap">
   <canvas id="game" aria-label="Archery game: aim with the pointer and click to shoot the target"></canvas>
+
+  <div id="startScreen">
+    <div class="startCard">
+      <h1>Quickdraw Quiver</h1>
+      <p>Ready, aim, and shoot!</p>
+      <button id="playBtn">PLAY</button>
+    </div>
+  </div>
+
   <div id="popup" role="dialog" aria-live="polite">
     <div class="card">
       <h1 id="msgTitle"></h1>
@@ -239,37 +314,32 @@
 
 <script>
   // ============ EDIT THESE ============
-  const HITS_NEEDED   = 5;
+  const HITS_NEEDED = 5;
   const MESSAGE_TITLE = "Hi Crush >_<";
-  const MESSAGE_TEXT  = "";
+  const MESSAGE_TEXT = "";
 
   const LETTER_TITLE = "To Yesha Camachows,";
   const LETTER_BODY = [
-    "So uhmm, hi pooo sooo I guess you've noticed or nahalata mo sakin to hehe and yesss I have a crush on youuuu its very big like dinosaur big rauwr",
-    "Anyways, jokes aside I actually have a crush on you po like very big and sa totoo lang bihira lang ako magka gusto kaya eto ako ngayon baliw na baliw sayooo partida kahit crush ko palang loyal na agad ako kahit taon man yan.",
-    "Also I want to know you better po hehe. Actually sabi ko sa sarili ko inde muna ako magkakagusto sa ibang tao pero simula nung nakaka encounter kita unti-unti rin nagbabago ung desisyon ko",
-    "then nahihiya talaga ako kasi its my first time na umamin sa ibang tao, kahit nga ako di makapaniwala na ginagawa ko to ngayon eh",
-    "and siguro to you, random na tao lang ako na biglang nagkagusto sayo, ikaw kasi!! ang ganda mo lagi WHAHHAHA and alam kong wala akong chance sayo pero ang laki ng chance mo sakin😝😝😝 actually ewan kung may chance ako sayo and sana meron hehe.",
-    "Siguro kung iniisip mo ngayon no I don't want your commitment agad kasi we are still students and priority parin ang makipagaral and this is just my way of showing my affection and to express my feelings for youuu kasi kung iisipin mo nga naman its hard magkarelationship ngayon",
+    "So uhmm, hi pooo sooo I guess you've noticed or nahalata mo sakin to hehe and yesss I have a crush on youuuu its very big like dinosaur big. rauwr.",
+    "Anyways, jokes aside I actually have a crush on you po like very big, and sa totoo lang bihira lang ako magka gusto kaya eto ako nga baliw na baliw sayooo at partida kahit crush ko palang loyal na agad ako kahit umabot pa ng taon man yan.",
+    "Also I want to know you better po hehe. Actually sabi ko sa sarili ko inde muna ako magkakagusto sa ibang tao pero simula nung nakaka encounter kita unti-unti rin nagbabago ung desisyon ko.",
+    "then nahihiya talaga ako kasi its my first time na umamin sa ibang tao, kahit nga ako di makapaniwala na ginagawa ko to ngayon eh.",
+    "and siguro to you, random na tao lang ako na biglang nagkagusto sayo, ikaw kasi!! ang ganda ganda moooowwssss WHAHHAHA and alam ko na wala man akong chance sayo pero ang laki ng chance mo sakin😝😝😝 actually ewan kung may chance ako sayo and sana meron hehe.",
+    "Siguro kung iniisip mo ngayon no I don't want you commitment agad kasi we don't know each other that much pa and we are still students and priority parin ang makapagaral and this is just my way of showing my affection and to express my feelings for youuu kasi kung iisipin mo nga naman its hard to be in a relationship ngayon.",
     "and just to be clear po, I'm not saying na ayaw ko ng commitment or anything like that. I just don't want us to rush into something we're not entirely ready for. I want to take things slowly, get to know you better, and see where this goes. If things work out between us, then I'd genuinely be happy to see where we could go. I just want us to enjoy getting to know each other without putting too much pressure on ourselves hehe."
   ];
   const LETTER_SIGN = "Always yours,\nAshhhh";
 
-  // ---- Sound ----
-  // Music and sound effects are made by the browser, so no audio files are needed.
-  // To use your own songs instead, put the files next to this HTML file and type their names:
-  const GAME_MUSIC_FILE = "";   // song while playing, e.g. "game.mp3"
-  const LOVE_MUSIC_FILE = "it-might-be-you.mp3";   // song for the ending, e.g. "love.mp3"
-  const LETTER_MUSIC_FILE = "pwede-ka-ba.mp3";   // song that starts when "One last thing" is pressed
-                                              // (put your copy of the file next to this HTML file)
-  const MUSIC_VOLUME = 0.5;     // 0 to 1
-  const SFX_VOLUME   = 0.8;     // 0 to 1
-  // ====================================
+  const GAME_MUSIC_FILE = "";
+  const LOVE_MUSIC_FILE = "it-might-be-you.mp3";
+  const LETTER_MUSIC_FILE = "pwede-ka-ba.mp3";
+  const MUSIC_VOLUME = 0.5;
+  const SFX_VOLUME = 0.8;
 
   const W = 960, H = 540;
   const GROUND = 470;
   const BOW = { x: 110, y: 385 };
-  const GRAVITY = 900;          // higher = arrows drop faster
+  const GRAVITY = 900;
   const TARGET_X = 820;
   const TARGET_R = 42;
 
@@ -281,10 +351,13 @@
 
   const popup = document.getElementById("popup");
   const letter = document.getElementById("letter");
+  const startScreen = document.getElementById("startScreen");
+
   document.getElementById("msgTitle").textContent = MESSAGE_TITLE;
   document.getElementById("msgText").textContent = MESSAGE_TEXT;
   document.getElementById("letterTitle").textContent = LETTER_TITLE;
   document.getElementById("letterSign").textContent = LETTER_SIGN;
+
   LETTER_BODY.forEach(t => {
     const p = document.createElement("p");
     p.textContent = t;
@@ -299,13 +372,12 @@
     const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
     const FILE_FOR = { game: GAME_MUSIC_FILE, love: LOVE_MUSIC_FILE, letter: LETTER_MUSIC_FILE };
 
-    // Chords and melody for the two tunes (MIDI note numbers)
-    const GAME_CH = [[60, 64, 67, 72], [55, 59, 62, 67], [57, 60, 64, 69], [53, 57, 60, 65]];
-    const ARP = [0, 1, 2, 3, 2, 1, 2, 1];
-    const LOVE_CH = [[57, 60, 64], [53, 57, 60], [55, 59, 62], [60, 64, 67]];
-    const LOVE_BASS = [45, 41, 43, 48];
-    const LOVE_MEL = [76, 79, 81, 79, 77, 76, 74, 72, 74, 76, 79, 76, 72, 74, 76, 0];
-    const PENTA = [1046.5, 1174.7, 1318.5, 1568, 1760, 2093];
+    const GAME_CH = [[60,64,67,72],[55,59,62,67],[57,60,64,69],[53,57,60,65]];
+    const ARP = [0,1,2,3,2,1,2,1];
+    const LOVE_CH = [[57,60,64],[53,57,60],[55,59,62],[60,64,67]];
+    const LOVE_BASS = [45,41,43,48];
+    const LOVE_MEL = [76,79,81,79,77,76,74,72,74,76,79,76,72,74,76,0];
+    const PENTA = [1046.5,1174.7,1318.5,1568,1760,2093];
 
     function init() {
       if (!ac) {
@@ -316,7 +388,6 @@
         master.gain.value = muted ? 0 : 1;
         master.connect(ac.destination);
 
-        // a soft, dreamy reverb made from decaying noise
         const len = Math.floor(ac.sampleRate * 2.6);
         const buf = ac.createBuffer(2, len, ac.sampleRate);
         for (let c = 0; c < 2; c++) {
@@ -330,11 +401,11 @@
         reverb.connect(rv);
         rv.connect(master);
 
-        mIn = ac.createGain();                 // music goes in here
+        mIn = ac.createGain();
         mIn.gain.value = 0;
         mIn.connect(master);
         mIn.connect(reverb);
-        sfx = ac.createGain();                 // sound effects go in here
+        sfx = ac.createGain();
         sfx.gain.value = SFX_VOLUME;
         sfx.connect(master);
         const sr = ac.createGain();
@@ -348,583 +419,671 @@
 
         document.addEventListener("visibilitychange", () => {
           if (!ac) return;
-          if (document.hidden) ac.suspend(); else ac.resume();
+          if (document.hidden) ac.suspend();
+          else ac.resume();
         });
-        ["game", "love", "letter"].forEach(getEl);       // start loading any songs right away
+
+        ["game","love","letter"].forEach(getEl);
       }
       if (ac.state !== "running") ac.resume();
       if (pending !== cur) applyMusic(pending, 1.5);
     }
 
-    // ----- music -----
-    function note(freq, t, dur, type, vol, attack, dest) {
+    function note(freq,t,dur,type,vol,attack,dest) {
       const o = ac.createOscillator(), g = ac.createGain();
       o.type = type;
       o.frequency.value = freq;
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(vol, t + attack);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(vol,t+attack);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
       o.connect(g);
       g.connect(dest);
       o.start(t);
-      o.stop(t + dur + 0.05);
+      o.stop(t+dur+0.05);
     }
-    const mnote = (f, t, d, type, v, a = 0.01) => note(f, t, d, type, v, a, mIn);
+
+    const mnote = (f,t,d,type,v,a=.01) => note(f,t,d,type,v,a,mIn);
 
     function playStep(t) {
-      if (mode === "game") {                   // light music-box arpeggio
-        const bar = Math.floor(step / 8) % 4, i = step % 8, ch = GAME_CH[bar];
+      if (mode === "game") {
+        const bar = Math.floor(step/8)%4, i = step%8, ch = GAME_CH[bar];
         const n = ch[ARP[i]];
-        mnote(mtof(n), t, 0.9, "triangle", 0.07);
-        mnote(mtof(n + 12), t, 0.5, "sine", 0.02);
-        if (i === 0) mnote(mtof(ch[0] - 12), t, 1.8, "sine", 0.09, 0.03);
-      } else if (mode === "love") {            // slow, warm pads with a bell melody
-        const bar = Math.floor(step / 4) % 4, i = step % 4, ch = LOVE_CH[bar];
-        if (i === 0) {
+        mnote(mtof(n),t,.9,"triangle",.07);
+        mnote(mtof(n+12),t,.5,"sine",.02);
+        if (i===0) mnote(mtof(ch[0]-12),t,1.8,"sine",.09,.03);
+      } else if (mode === "love") {
+        const bar = Math.floor(step/4)%4, i = step%4, ch = LOVE_CH[bar];
+        if (i===0) {
           ch.forEach(n => {
-            mnote(mtof(n), t, 4.2, "triangle", 0.03, 0.8);
-            mnote(mtof(n) * 1.004, t, 4.2, "triangle", 0.03, 0.8);
+            mnote(mtof(n),t,4.2,"triangle",.03,.8);
+            mnote(mtof(n)*1.004,t,4.2,"triangle",.03,.8);
           });
-          mnote(mtof(LOVE_BASS[bar]), t, 3.8, "sine", 0.1, 0.05);
+          mnote(mtof(LOVE_BASS[bar]),t,3.8,"sine",.1,.05);
         }
-        const m = LOVE_MEL[step % 16];
+        const m = LOVE_MEL[step%16];
         if (m) {
-          mnote(mtof(m), t, 2.4, "sine", 0.08);
-          mnote(mtof(m) * 2, t, 1.2, "sine", 0.02);
+          mnote(mtof(m),t,2.4,"sine",.08);
+          mnote(mtof(m)*2,t,1.2,"sine",.02);
         }
-        if (i % 2 === 1) mnote(mtof(ch[(i >> 1) % 3] + 24), t + 0.45, 0.9, "sine", 0.02);
+        if (i%2===1) mnote(mtof(ch[(i>>1)%3]+24),t+.45,.9,"sine",.02);
       }
       step++;
     }
+
     function schedule() {
-      if (!ac || (mode !== "game" && mode !== "love")) return;
-      const len = mode === "love" ? 0.9 : 0.3;
-      while (nextT < ac.currentTime + 0.4) { playStep(nextT); nextT += len; }
+      if (!ac || (mode!=="game" && mode!=="love")) return;
+      const len = mode==="love" ? .9 : .3;
+      while (nextT < ac.currentTime+.4) {
+        playStep(nextT);
+        nextT += len;
+      }
     }
-    function ramp(param, v, secs) {
+
+    function ramp(param,v,secs) {
       const now = ac.currentTime;
       param.cancelScheduledValues(now);
-      param.setValueAtTime(param.value, now);
-      param.linearRampToValueAtTime(v, now + secs);
+      param.setValueAtTime(param.value,now);
+      param.linearRampToValueAtTime(v,now+secs);
     }
-    function fadeEl(el, to, secs, pauseAfter) {
+
+    function fadeEl(el,to,secs,pauseAfter) {
       clearInterval(el._t);
-      const from = el.volume, steps = Math.max(1, Math.round(secs * 20));
-      let i = 0;
-      el._t = setInterval(() => {
+      const from = el.volume, steps = Math.max(1,Math.round(secs*20));
+      let i=0;
+      el._t=setInterval(()=>{
         i++;
-        el.volume = clamp(from + (to - from) * (i / steps), 0, 1);
-        if (i >= steps) { clearInterval(el._t); if (pauseAfter) el.pause(); }
-      }, 50);
+        el.volume=clamp(from+(to-from)*(i/steps),0,1);
+        if (i>=steps) {
+          clearInterval(el._t);
+          if (pauseAfter) el.pause();
+        }
+      },50);
     }
+
     function getEl(m) {
       if (!FILE_FOR[m]) return null;
-      let el = files[m];
+      let el=files[m];
       if (!el) {
-        el = files[m] = new Audio(FILE_FOR[m]);
-        el.loop = true;
-        el.volume = 0;
-        el.preload = "auto";
-        // if the song can't be loaded, use the built-in tune instead of silence
-        el.onerror = () => { if (cur === m) startSynth(m === "game" ? "game" : "love", 1.5); };
+        el=files[m]=new Audio(FILE_FOR[m]);
+        el.loop=true;
+        el.volume=0;
+        el.preload="auto";
+        el.onerror=()=>{
+          if (cur===m) startSynth(m==="game"?"game":"love",1.5);
+        };
       }
       return el;
     }
-    function applyMusic(m, fade) {
-      pending = m;
+
+    function applyMusic(m,fade) {
+      pending=m;
       if (!ac) return;
-      cur = m;
-      for (const k in files) fadeEl(files[k], 0, Math.min(fade, 1), true);
-      if (m === "off") { ramp(mIn.gain, 0, fade); mode = "off"; return; }
-      const el = getEl(m);
-      if (el) {                                // your own song
-        mode = "off";
-        ramp(mIn.gain, 0, 0.5);
-        el.muted = muted;
-        el.play().catch(() => { if (cur === m && el.error) startSynth(m === "game" ? "game" : "love", 1.5); });
-        fadeEl(el, MUSIC_VOLUME, fade, false);
-      } else {                                 // the built-in tune
-        startSynth(m === "game" ? "game" : "love", fade);
+      cur=m;
+      for (const k in files) fadeEl(files[k],0,Math.min(fade,1),true);
+      if (m==="off") {
+        ramp(mIn.gain,0,fade);
+        mode="off";
+        return;
+      }
+      const el=getEl(m);
+      if (el) {
+        mode="off";
+        ramp(mIn.gain,0,.5);
+        el.muted=muted;
+        el.play().catch(()=>{
+          if (cur===m && el.error) startSynth(m==="game"?"game":"love",1.5);
+        });
+        fadeEl(el,MUSIC_VOLUME,fade,false);
+      } else {
+        startSynth(m==="game"?"game":"love",fade);
       }
     }
-    function startSynth(m, fade) {
-      mode = m;
-      step = 0;
-      nextT = ac.currentTime + 0.1;
-      ramp(mIn.gain, MUSIC_VOLUME * 1.6, fade);
-      if (!timer) timer = setInterval(schedule, 100);
+
+    function startSynth(m,fade) {
+      mode=m;
+      step=0;
+      nextT=ac.currentTime+.1;
+      ramp(mIn.gain,MUSIC_VOLUME*1.6,fade);
+      if (!timer) timer=setInterval(schedule,100);
     }
 
-    // ----- sound effects -----
-    const ready = () => ac && !muted && ac.state === "running";
-    function tone(f0, t, dur, type, vol, f1) {
-      const o = ac.createOscillator(), g = ac.createGain();
-      o.type = type;
-      o.frequency.setValueAtTime(f0, t);
-      if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(vol, t + 0.006);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    const ready=()=>ac&&!muted&&ac.state==="running";
+
+    function tone(f0,t,dur,type,vol,f1) {
+      const o=ac.createOscillator(),g=ac.createGain();
+      o.type=type;
+      o.frequency.setValueAtTime(f0,t);
+      if (f1) o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+      g.gain.setValueAtTime(.0001,t);
+      g.gain.exponentialRampToValueAtTime(vol,t+.006);
+      g.gain.exponentialRampToValueAtTime(.0001,t+dur);
       o.connect(g);
       g.connect(sfx);
       o.start(t);
-      o.stop(t + dur + 0.05);
+      o.stop(t+dur+.05);
     }
-    function noise(t, dur, f0, f1, type, vol) {
-      const s = ac.createBufferSource(), f = ac.createBiquadFilter(), g = ac.createGain();
-      s.buffer = noiseBuf;
-      f.type = type;
-      f.Q.value = 1.1;
-      f.frequency.setValueAtTime(f0, t);
-      f.frequency.exponentialRampToValueAtTime(f1, t + dur);
-      g.gain.setValueAtTime(vol, t);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+    function noise(t,dur,f0,f1,type,vol) {
+      const s=ac.createBufferSource(),f=ac.createBiquadFilter(),g=ac.createGain();
+      s.buffer=noiseBuf;
+      f.type=type;
+      f.Q.value=1.1;
+      f.frequency.setValueAtTime(f0,t);
+      f.frequency.exponentialRampToValueAtTime(f1,t+dur);
+      g.gain.setValueAtTime(vol,t);
+      g.gain.exponentialRampToValueAtTime(.0001,t+dur);
       s.connect(f);
       f.connect(g);
       g.connect(sfx);
       s.start(t);
-      s.stop(t + dur + 0.05);
+      s.stop(t+dur+.05);
     }
 
     return {
       init,
-      music: (m, fade = 1.5) => applyMusic(m, fade),
+      music:(m,fade=1.5)=>applyMusic(m,fade),
       setMuted(v) {
-        muted = v;
-        if (ac) master.gain.setTargetAtTime(v ? 0 : 1, ac.currentTime, 0.05);
-        for (const k in files) files[k].muted = v;
+        muted=v;
+        if (ac) master.gain.setTargetAtTime(v?0:1,ac.currentTime,.05);
+        for (const k in files) files[k].muted=v;
       },
-      shoot() {                                // bowstring twang and a whoosh
+      shoot() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        noise(t, 0.28, 1800, 350, "bandpass", 0.35);
-        noise(t, 0.04, 5000, 3000, "highpass", 0.2);
-        tone(240, t, 0.3, "triangle", 0.22, 120);
+        const t=ac.currentTime;
+        noise(t,.28,1800,350,"bandpass",.35);
+        noise(t,.04,5000,3000,"highpass",.2);
+        tone(240,t,.3,"triangle",.22,120);
       },
-      hit(n) {                                 // thunk + a bell that climbs with each hit
+      hit(n) {
         if (!ready()) return;
-        const t = ac.currentTime, f = [523.25, 587.33, 659.25, 783.99, 1046.5][clamp(n, 1, 5) - 1];
-        tone(150, t, 0.2, "sine", 0.55, 60);
-        noise(t, 0.08, 900, 300, "lowpass", 0.4);
-        tone(f, t + 0.02, 1.0, "triangle", 0.28);
-        tone(f * 2.005, t + 0.02, 0.6, "sine", 0.1);
+        const t=ac.currentTime;
+        const f=[523.25,587.33,659.25,783.99,1046.5][clamp(n,1,5)-1];
+        tone(150,t,.2,"sine",.55,60);
+        noise(t,.08,900,300,"lowpass",.4);
+        tone(f,t+.02,1,"triangle",.28);
+        tone(f*2.005,t+.02,.6,"sine",.1);
       },
-      miss(lost) {                             // soft thud, and a sad little slide if a point was lost
+      miss(lost) {
         if (!ready()) return;
-        const t = ac.currentTime;
-        tone(170, t, 0.22, "sine", 0.35, 70);
-        noise(t, 0.12, 700, 200, "lowpass", 0.25);
+        const t=ac.currentTime;
+        tone(170,t,.22,"sine",.35,70);
+        noise(t,.12,700,200,"lowpass",.25);
         if (lost) {
-          tone(330, t + 0.05, 0.25, "triangle", 0.16, 200);
-          tone(247, t + 0.25, 0.35, "triangle", 0.16, 150);
+          tone(330,t+.05,.25,"triangle",.16,200);
+          tone(247,t+.25,.35,"triangle",.16,150);
         }
       },
-      tension() {                              // the frozen moment: rising hum and cracking glass
+      tension() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        tone(110, t, 0.55, "sine", 0.3, 900);
-        tone(60, t, 0.5, "sine", 0.35, 45);
-        [0.05, 0.17, 0.3].forEach(d => noise(t + d, 0.06, 5000, 2500, "highpass", 0.45));
+        const t=ac.currentTime;
+        tone(110,t,.55,"sine",.3,900);
+        tone(60,t,.5,"sine",.35,45);
+        [.05,.17,.3].forEach(d=>noise(t+d,.06,5000,2500,"highpass",.45));
       },
-      shatter() {                              // the break
+      shatter() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        noise(t, 1.0, 6000, 700, "highpass", 0.8);
-        tone(70, t, 0.7, "sine", 0.7, 30);
-        for (let i = 0; i < 16; i++) {
-          tone(1400 + Math.random() * 4200, t + Math.random() * 0.8, 0.25 + Math.random() * 0.35, "sine", 0.1);
+        const t=ac.currentTime;
+        noise(t,1,6000,700,"highpass",.8);
+        tone(70,t,.7,"sine",.7,30);
+        for (let i=0;i<16;i++) {
+          tone(1400+Math.random()*4200,t+Math.random()*.8,.25+Math.random()*.35,"sine",.1);
         }
-        [1046.5, 1318.5, 1568].forEach((f, i) => tone(f, t + 0.2 + i * 0.07, 2.2, "sine", 0.12));
+        [1046.5,1318.5,1568].forEach((f,i)=>tone(f,t+.2+i*.07,2.2,"sine",.12));
       },
-      pop() {                                  // the message card appearing
+      pop() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        tone(500, t, 0.14, "sine", 0.3, 1100);
-        [784, 988, 1175, 1568].forEach((f, i) => tone(f, t + 0.08 + i * 0.07, 0.6, "triangle", 0.12));
+        const t=ac.currentTime;
+        tone(500,t,.14,"sine",.3,1100);
+        [784,988,1175,1568].forEach((f,i)=>tone(f,t+.08+i*.07,.6,"triangle",.12));
       },
-      paper() {                                // opening the envelope
+      paper() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        noise(t, 0.35, 2600, 1100, "bandpass", 0.22);
-        noise(t + 0.4, 0.4, 2200, 900, "bandpass", 0.2);
+        const t=ac.currentTime;
+        noise(t,.35,2600,1100,"bandpass",.22);
+        noise(t+.4,.4,2200,900,"bandpass",.2);
       },
       chime() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        [1046.5, 1568, 2093].forEach((f, i) => tone(f, t + i * 0.12, 1.6, "sine", 0.1));
+        const t=ac.currentTime;
+        [1046.5,1568,2093].forEach((f,i)=>tone(f,t+i*.12,1.6,"sine",.1));
       },
-      swell() {                                // going to the final screen
+      swell() {
         if (!ready()) return;
-        const t = ac.currentTime;
-        [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, t + i * 0.15, 2.0, "sine", 0.1));
-        noise(t, 1.2, 8000, 3000, "highpass", 0.08);
+        const t=ac.currentTime;
+        [523.25,659.25,783.99,1046.5].forEach((f,i)=>tone(f,t+i*.15,2,"sine",.1));
+        noise(t,1.2,8000,3000,"highpass",.08);
       },
-      twinkle() {                              // a sparkle on the heart
+      twinkle() {
         if (!ready()) return;
-        const t = ac.currentTime, f = PENTA[(Math.random() * PENTA.length) | 0];
-        tone(f, t, 0.7, "sine", 0.05);
-        tone(f * 2, t + 0.03, 0.4, "sine", 0.02);
+        const t=ac.currentTime,f=PENTA[(Math.random()*PENTA.length)|0];
+        tone(f,t,.7,"sine",.05);
+        tone(f*2,t+.03,.4,"sine",.02);
       }
     };
   })();
 
-  // Browsers only allow sound after a tap or key press, so the audio starts on the first one
-  ["pointerdown", "pointerup", "click", "touchend", "keydown"].forEach(ev =>
-    document.addEventListener(ev, () => snd.init(), true));
+  ["pointerdown","pointerup","click","touchend","keydown"].forEach(ev =>
+    document.addEventListener(ev,()=>snd.init(),true)
+  );
 
-  const muteBtn = document.getElementById("muteBtn");
-  muteBtn.addEventListener("click", () => {
-    const m = muteBtn.getAttribute("aria-pressed") !== "true";
+  const muteBtn=document.getElementById("muteBtn");
+  muteBtn.addEventListener("click",()=>{
+    const m=muteBtn.getAttribute("aria-pressed")!=="true";
     snd.setMuted(m);
-    muteBtn.setAttribute("aria-pressed", String(m));
-    muteBtn.textContent = m ? "\uD83D\uDD07" : "\uD83D\uDD0A";
-    muteBtn.setAttribute("aria-label", m ? "Unmute sound" : "Mute sound");
+    muteBtn.setAttribute("aria-pressed",String(m));
+    muteBtn.textContent=m?"\uD83D\uDD07":"\uD83D\uDD0A";
+    muteBtn.setAttribute("aria-label",m?"Unmute sound":"Mute sound");
   });
 
   // ---------- State ----------
-  let aim = { x: 600, y: 250 };
-  let arrows, stuck, groundArrows, parts, rise, floaters, missFlash, hits, state, lastShot, shots, time, winT, popupShown, target, shattered, tiles, cracks, snap;
+  let aim={x:600,y:250};
+  let arrows,stuck,groundArrows,parts,rise,floaters,missFlash,hits,state,lastShot,shots,time,winT,popupShown,target,shattered,tiles,cracks,snap;
 
   function reset() {
-    arrows = []; stuck = []; groundArrows = []; parts = []; rise = []; floaters = []; missFlash = 0;
-    shattered = false; tiles = []; cracks = []; snap = null;
-    hits = 0; state = "play"; lastShot = 0; shots = 0; time = 0; winT = 0; popupShown = false;
-    target = { y: 250, pulse: 0, moving: true };
+    arrows=[]; stuck=[]; groundArrows=[]; parts=[]; rise=[]; floaters=[]; missFlash=0;
+    shattered=false; tiles=[]; cracks=[]; snap=null;
+    hits=0; state="menu"; lastShot=0; shots=0; time=0; winT=0; popupShown=false;
+    target={y:250,pulse:0,moving:true};
     popup.classList.remove("show");
     letter.classList.remove("show");
   }
   reset();
 
-  const stars = Array.from({ length: 60 }, () => ({
-    x: Math.random() * W, y: Math.random() * GROUND * 0.8, r: Math.random() * 1.4 + .3
+  const stars=Array.from({length:60},()=>({
+    x:Math.random()*W,
+    y:Math.random()*GROUND*.8,
+    r:Math.random()*1.4+.3
   }));
-  const clouds = [
-    { x: 120, y: 90,  s: 1.0, v: 8 },
-    { x: 520, y: 150, s: 1.3, v: 5 },
-    { x: 800, y: 70,  s: 0.8, v: 11 }
+
+  const clouds=[
+    {x:120,y:90,s:1,v:8},
+    {x:520,y:150,s:1.3,v:5},
+    {x:800,y:70,s:.8,v:11}
   ];
 
-  // ---------- Heart geometry (used by the transition) ----------
-  const HEART_PTS = [];
-  for (let i = 0; i < 120; i++) {
-    const t = (i / 120) * Math.PI * 2;
+  // ---------- Heart geometry ----------
+  const HEART_PTS=[];
+  for (let i=0;i<120;i++) {
+    const t=(i/120)*Math.PI*2;
     HEART_PTS.push([
-      16 * Math.pow(Math.sin(t), 3),
-      13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t) + 2.5
+      16*Math.pow(Math.sin(t),3),
+      13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)+2.5
     ]);
   }
-  function traceHeart(cx, cy, s) {
+
+  function traceHeart(cx,cy,s) {
     ctx.beginPath();
-    HEART_PTS.forEach((p, i) => {
-      const x = cx + p[0] * s, y = cy - p[1] * s;
-      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    HEART_PTS.forEach((p,i)=>{
+      const x=cx+p[0]*s,y=cy-p[1]*s;
+      i?ctx.lineTo(x,y):ctx.moveTo(x,y);
     });
     ctx.closePath();
   }
 
   // ---------- Aiming and shooting ----------
-  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
   function aimInfo() {
-    const dx = aim.x - BOW.x, dy = aim.y - BOW.y;
+    const dx=aim.x-BOW.x,dy=aim.y-BOW.y;
     return {
-      angle: clamp(Math.atan2(dy, dx), -1.4, 0.35),
-      power: clamp(Math.hypot(dx, dy) * 2.6, 520, 1150)
+      angle:clamp(Math.atan2(dy,dx),-1.4,.35),
+      power:clamp(Math.hypot(dx,dy)*2.6,520,1150)
     };
   }
+
   function toLogical(e) {
-    const r = cv.getBoundingClientRect();
-    return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height };
+    const r=cv.getBoundingClientRect();
+    return {
+      x:(e.clientX-r.left)*W/r.width,
+      y:(e.clientY-r.top)*H/r.height
+    };
   }
+
   function shoot() {
-    const now = performance.now();
-    if (state !== "play" || now - lastShot < 350) return;
-    lastShot = now;
+    const now=performance.now();
+    if (state!=="play" || now-lastShot<350) return;
+    lastShot=now;
     shots++;
     snd.shoot();
-    const { angle, power } = aimInfo();
+    const {angle,power}=aimInfo();
     arrows.push({
-      x: BOW.x + Math.cos(angle) * 50, y: BOW.y + Math.sin(angle) * 50,
-      vx: Math.cos(angle) * power, vy: Math.sin(angle) * power, angle
+      x:BOW.x+Math.cos(angle)*50,
+      y:BOW.y+Math.sin(angle)*50,
+      vx:Math.cos(angle)*power,
+      vy:Math.sin(angle)*power,
+      angle
     });
   }
-  cv.addEventListener("pointermove", e => { aim = toLogical(e); });
-  cv.addEventListener("pointerdown", e => { aim = toLogical(e); shoot(); });
-  addEventListener("keydown", e => {
-    if (e.code === "Space" && !letter.classList.contains("show")) { e.preventDefault(); shoot(); }
+
+  cv.addEventListener("pointermove",e=>{aim=toLogical(e);});
+  cv.addEventListener("pointerdown",e=>{aim=toLogical(e);shoot();});
+
+  addEventListener("keydown",e=>{
+    if (e.code==="Space" && state==="play") {
+      e.preventDefault();
+      shoot();
+    }
+  });
+
+  // ---------- Startup button ----------
+  document.getElementById("playBtn").addEventListener("click",()=>{
+    reset();
+    startScreen.classList.add("hidden");
+    state="play";
+    snd.init();
+    snd.music("game",1.5);
   });
 
   // ---------- Buttons ----------
-  document.getElementById("readLetter").addEventListener("click", () => {
+  document.getElementById("readLetter").addEventListener("click",()=>{
     popup.classList.remove("show");
     snd.paper();
-    setTimeout(() => snd.chime(), 2300);
-    // restart the envelope animation each time
-    const env = letter.querySelector(".envelope"), paper = letter.querySelector(".paper");
-    [env, letter.querySelector(".flap"), letter.querySelector(".seal"), paper].forEach(el => {
-      el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
+    setTimeout(()=>snd.chime(),2300);
+    const env=letter.querySelector(".envelope"),paper=letter.querySelector(".paper");
+    [env,letter.querySelector(".flap"),letter.querySelector(".seal"),paper].forEach(el=>{
+      el.style.animation="none";
+      void el.offsetWidth;
+      el.style.animation="";
     });
-    paper.scrollTop = 0;
+    paper.scrollTop=0;
     letter.classList.add("show");
   });
-  // ---------- Finale: a rotating 3D heart of "I love you" in 20 languages ----------
-  const finale = document.getElementById("finale");
-  const fc = document.getElementById("finaleCanvas");
-  const fx = fc.getContext("2d");
-  // The words that fill the heart. Add more entries to mix several phrases or languages.
-  const LOVE = [
-    ["Yesha", "en"]
-  ];
-  const WORD_COLORS = ["#ff2b2b", "#ff4040", "#e8222d", "#ff5252", "#d91c26"];
-  const SPARKLE_RGB = [255, 200, 220];   // light pink
-  const SPARKLE_POWER = 14;              // higher = shorter, rarer sparkles
-  const hexRgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-  const RING_END = 5.5;        // seconds: the outline is finished by now
-  const COVER = 2;             // every spot of the heart is covered by at least this many phrases
-  const MAX_WORDS = 3200;      // safety limit on the number of phrases
-  const FILL_TIME = 14;        // seconds: how long the inside takes to fill, edges first
-  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let fRaf = 0, fStart = 0, fWords = [], fDim = null, fDoneAt = 0, fStatic = null, fsx = null, fTwinkle = 0;
+  // ---------- Finale ----------
+  const finale=document.getElementById("finale");
+  const fc=document.getElementById("finaleCanvas");
+  const fx=fc.getContext("2d");
+
+  const LOVE=[["Yesha","en"]];
+  const WORD_COLORS=["#ff2b2b","#ff4040","#e8222d","#ff5252","#d91c26"];
+  const SPARKLE_RGB=[255,200,220];
+  const SPARKLE_POWER=14;
+  const hexRgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16));
+  const RING_END=5.5;
+  const COVER=2;
+  const MAX_WORDS=3200;
+  const FILL_TIME=14;
+  const REDUCED=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  let fRaf=0,fStart=0,fWords=[],fDim=null,fDoneAt=0,fStatic=null,fsx=null,fTwinkle=0;
 
   function layoutFinale() {
-    const dpr2 = Math.min(window.devicePixelRatio || 1, 2);
-    const cw = innerWidth, ch = innerHeight;
-    fc.width = cw * dpr2;
-    fc.height = ch * dpr2;
-    const u = Math.min(cw * 0.9 / 32, ch * 0.86 / 29);   // size of one heart unit in pixels
-    const font = Math.max(9.5, u * 0.62);
-    const css = "bold " + font + "px Georgia, 'Segoe UI', 'Noto Sans', sans-serif";
-    fDim = { cw, ch, dpr: dpr2, font, css };
+    const dpr2=Math.min(window.devicePixelRatio||1,2);
+    const cw=innerWidth,ch=innerHeight;
+    fc.width=cw*dpr2;
+    fc.height=ch*dpr2;
+    const u=Math.min(cw*.9/32,ch*.86/29);
+    const font=Math.max(9.5,u*.62);
+    const css="bold "+font+"px Georgia, 'Segoe UI', 'Noto Sans', sans-serif";
+    fDim={cw,ch,dpr:dpr2,font,css};
 
-    // A second canvas keeps every finished phrase, so only the moving ones are redrawn each frame
-    fStatic = document.createElement("canvas");
-    fStatic.width = fc.width;
-    fStatic.height = fc.height;
-    fsx = fStatic.getContext("2d");
-    fsx.font = css;
-    fsx.textAlign = "center";
-    fsx.textBaseline = "middle";
+    fStatic=document.createElement("canvas");
+    fStatic.width=fc.width;
+    fStatic.height=fc.height;
+    fsx=fStatic.getContext("2d");
+    fsx.font=css;
+    fsx.textAlign="center";
+    fsx.textBaseline="middle";
 
-    fx.font = css;
-    const widths = LOVE.map(l => fx.measureText(l[0]).width);
+    fx.font=css;
+    const widths=LOVE.map(l=>fx.measureText(l[0]).width);
 
-    // Heart outline (y points up, centred on 0,0), starting at the top notch and going clockwise
-    const N = 600, poly = [];
-    for (let i = 0; i < N; i++) {
-      const t = (i / N) * Math.PI * 2;
+    const N=600,poly=[];
+    for (let i=0;i<N;i++) {
+      const t=(i/N)*Math.PI*2;
       poly.push([
-        16 * Math.pow(Math.sin(t), 3) * u,
-        (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t) + 2.5) * u
+        16*Math.pow(Math.sin(t),3)*u,
+        (13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t)+2.5)*u
       ]);
     }
-    const inside = (x, y) => {
-      let c = false;
-      for (let i = 0, j = N - 1; i < N; j = i++) {
-        const [xi, yi] = poly[i], [xj, yj] = poly[j];
-        if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+
+    const inside=(x,y)=>{
+      let c=false;
+      for (let i=0,j=N-1;i<N;j=i++) {
+        const [xi,yi]=poly[i],[xj,yj]=poly[j];
+        if ((yi>y)!==(yj>y) && x<(xj-xi)*(y-yi)/(yj-yi)+xi) c=!c;
       }
       return c;
     };
-    const edgeDist = (x, y) => {
-      let m = Infinity;
-      for (const p of poly) m = Math.min(m, Math.hypot(p[0] - x, p[1] - y));
+
+    const edgeDist=(x,y)=>{
+      let m=Infinity;
+      for (const p of poly) m=Math.min(m,Math.hypot(p[0]-x,p[1]-y));
       return m;
     };
-    const pick = () => (Math.random() * LOVE.length) | 0;
-    const size = () => 0.7 + Math.pow(Math.random(), 1.6) * 1.2;   // mostly small, a few big
-    const make = (k, x, y, rot, m) => ({
-      text: LOVE[k][0], x, y, rot, m, baked: false,
-      cs: Math.cos(rot) * m, sn: Math.sin(rot) * m,
-      hw: widths[k] * m * 0.46, hh: font * m * 0.36,          // the part of the box that really holds ink
-      color: WORD_COLORS[(Math.random() * WORD_COLORS.length) | 0],
-      alpha: 0.6 + Math.random() * 0.4,
-      speed: 0.8 + Math.random() * 1.4,                       // how often this phrase sparkles
-      phase: Math.random() * Math.PI * 2
+
+    const pick=()=> (Math.random()*LOVE.length)|0;
+    const size=()=>.7+Math.pow(Math.random(),1.6)*1.2;
+
+    const make=(k,x,y,rot,m)=>({
+      text:LOVE[k][0],x,y,rot,m,baked:false,
+      cs:Math.cos(rot)*m,sn:Math.sin(rot)*m,
+      hw:widths[k]*m*.46,hh:font*m*.36,
+      color:WORD_COLORS[(Math.random()*WORD_COLORS.length)|0],
+      alpha:.6+Math.random()*.4,
+      speed:.8+Math.random()*1.4,
+      phase:Math.random()*Math.PI*2
     });
 
-    // Coverage map: tracks which spots of the heart still have no text on them
-    const g = font * 0.45;
-    const gx0 = -16 * u, gy0 = -14.5 * u;
-    const GW = Math.ceil(32 * u / g), GH = Math.ceil(29 * u / g);
-    const cover = new Uint8Array(GW * GH);
-    const need = [];
-    for (let gy = 0; gy < GH; gy++) {
-      for (let gx = 0; gx < GW; gx++) {
-        if (inside(gx0 + (gx + 0.5) * g, gy0 + (gy + 0.5) * g)) need.push(gy * GW + gx);
+    const g=font*.45;
+    const gx0=-16*u,gy0=-14.5*u;
+    const GW=Math.ceil(32*u/g),GH=Math.ceil(29*u/g);
+    const cover=new Uint8Array(GW*GH);
+    const need=[];
+
+    for (let gy=0;gy<GH;gy++) {
+      for (let gx=0;gx<GW;gx++) {
+        if (inside(gx0+(gx+.5)*g,gy0+(gy+.5)*g)) need.push(gy*GW+gx);
       }
     }
-    const mark = w => {
-      const R = w.hw + w.hh, c = Math.cos(w.rot), sn = Math.sin(w.rot);
-      const x0 = Math.max(0, Math.floor((w.x - R - gx0) / g)), x1 = Math.min(GW - 1, Math.floor((w.x + R - gx0) / g));
-      const y0 = Math.max(0, Math.floor((w.y - R - gy0) / g)), y1 = Math.min(GH - 1, Math.floor((w.y + R - gy0) / g));
-      for (let gy = y0; gy <= y1; gy++) {
-        for (let gx = x0; gx <= x1; gx++) {
-          const dx = gx0 + (gx + 0.5) * g - w.x, dy = gy0 + (gy + 0.5) * g - w.y;
-          const along = dx * c - dy * sn, across = dx * sn + dy * c;
-          const i = gy * GW + gx;
-          if (Math.abs(along) <= w.hw && Math.abs(across) <= w.hh && cover[i] < 255) cover[i]++;
+
+    const mark=w=>{
+      const R=w.hw+w.hh,c=Math.cos(w.rot),sn=Math.sin(w.rot);
+      const x0=Math.max(0,Math.floor((w.x-R-gx0)/g));
+      const x1=Math.min(GW-1,Math.floor((w.x+R-gx0)/g));
+      const y0=Math.max(0,Math.floor((w.y-R-gy0)/g));
+      const y1=Math.min(GH-1,Math.floor((w.y+R-gy0)/g));
+
+      for (let gy=y0;gy<=y1;gy++) {
+        for (let gx=x0;gx<=x1;gx++) {
+          const dx=gx0+(gx+.5)*g-w.x;
+          const dy=gy0+(gy+.5)*g-w.y;
+          const along=dx*c-dy*sn;
+          const across=dx*sn+dy*c;
+          const i=gy*GW+gx;
+          if (Math.abs(along)<=w.hw && Math.abs(across)<=w.hh && cover[i]<255) cover[i]++;
         }
       }
     };
 
-    // 1) the outline: phrases sit right on the edge, overlapping their neighbours
-    let perimeter = 0;
-    for (let i = 0; i < N; i++) {
-      const a = poly[i], b = poly[(i + 1) % N];
-      perimeter += Math.hypot(b[0] - a[0], b[1] - a[1]);
+    let perimeter=0;
+    for (let i=0;i<N;i++) {
+      const a=poly[i],b=poly[(i+1)%N];
+      perimeter+=Math.hypot(b[0]-a[0],b[1]-a[1]);
     }
-    const ringCount = Math.round(perimeter / (Math.min(...widths) * 0.7));
-    const ring = [];
-    for (let i = 0; i < ringCount; i++) {
-      const idx = Math.floor((i / ringCount) * N);
-      const a = poly[(idx + N - 3) % N], b = poly[(idx + 3) % N];
-      let rot = Math.atan2(-(b[1] - a[1]), b[0] - a[0]);          // follow the edge, but stay upright
-      if (Math.cos(rot) < 0) rot += Math.PI;
-      const jitter = (Math.random() - 0.5) * font * 0.7;
-      const w = make(pick(), poly[idx][0] + jitter, poly[idx][1] + jitter, rot + (Math.random() - 0.5) * 0.3, 0.9 + Math.random() * 0.6);
-      w.delay = 0.5 + (i / ringCount) * (RING_END - 0.5);
+
+    const ringCount=Math.round(perimeter/(Math.min(...widths)*.7));
+    const ring=[];
+
+    for (let i=0;i<ringCount;i++) {
+      const idx=Math.floor((i/ringCount)*N);
+      const a=poly[(idx+N-3)%N],b=poly[(idx+3)%N];
+      let rot=Math.atan2(-(b[1]-a[1]),b[0]-a[0]);
+      if (Math.cos(rot)<0) rot+=Math.PI;
+      const jitter=(Math.random()-.5)*font*.7;
+      const w=make(
+        pick(),
+        poly[idx][0]+jitter,
+        poly[idx][1]+jitter,
+        rot+(Math.random()-.5)*.3,
+        .9+Math.random()*.6
+      );
+      w.delay=.5+(i/ringCount)*(RING_END-.5);
       mark(w);
       ring.push(w);
     }
 
-    // 2) the inside: keep adding phrases (random size and tilt, free to overlap)
-    //    wherever a spot is still bare, until no space is left
-    const inner = [];
-    let guard = 0;
-    while (need.length && inner.length < MAX_WORDS && guard++ < MAX_WORDS * 6) {
-      const ri = (Math.random() * need.length) | 0;
-      const ci = need[ri];
-      if (cover[ci] >= COVER) { need[ri] = need[need.length - 1]; need.pop(); continue; }
-      const gx = ci % GW, gy = (ci / GW) | 0;
-      const cx = gx0 + (gx + 0.5) * g + (Math.random() - 0.5) * g * 0.3;
-      const cy = gy0 + (gy + 0.5) * g + (Math.random() - 0.5) * g * 0.3;
+    const inner=[];
+    let guard=0;
 
-      let k, rot, m, tries = 0, ok;
-      do {                                                         // prefer phrases that stay inside the heart
-        k = pick();
-        rot = (Math.random() - 0.5) * 0.9;
-        m = size() * (tries > 2 ? 0.75 : 1);
-        const half = widths[k] * m * 0.5, dx = Math.cos(rot) * half, dy = -Math.sin(rot) * half;
-        ok = inside(cx + dx, cy + dy) && inside(cx - dx, cy - dy);
+    while (need.length && inner.length<MAX_WORDS && guard++<MAX_WORDS*6) {
+      const ri=(Math.random()*need.length)|0;
+      const ci=need[ri];
+
+      if (cover[ci]>=COVER) {
+        need[ri]=need[need.length-1];
+        need.pop();
+        continue;
+      }
+
+      const gx=ci%GW,gy=(ci/GW)|0;
+      const cx=gx0+(gx+.5)*g+(Math.random()-.5)*g*.3;
+      const cy=gy0+(gy+.5)*g+(Math.random()-.5)*g*.3;
+
+      let k,rot,m,tries=0,ok;
+      do {
+        k=pick();
+        rot=(Math.random()-.5)*.9;
+        m=size()*(tries>2?.75:1);
+        const half=widths[k]*m*.5;
+        const dx=Math.cos(rot)*half,dy=-Math.sin(rot)*half;
+        ok=inside(cx+dx,cy+dy)&&inside(cx-dx,cy-dy);
         tries++;
-      } while (!ok && tries < 6);
+      } while (!ok&&tries<6);
 
-      const w = make(k, cx, cy, rot, m);
-      w.depth = edgeDist(cx, cy);
-      const before = cover[ci];
+      const w=make(k,cx,cy,rot,m);
+      w.depth=edgeDist(cx,cy);
+      const before=cover[ci];
       mark(w);
-      if (cover[ci] === before) cover[ci]++;                        // always make progress
+      if (cover[ci]===before) cover[ci]++;
       inner.push(w);
     }
-    const maxDepth = Math.max(...inner.map(w => w.depth), 1);
+
+    const maxDepth=Math.max(...inner.map(w=>w.depth),1);
     for (const w of inner) {
-      w.delay = RING_END + 0.5 + (w.depth / maxDepth) * FILL_TIME + Math.random() * 1.2;
+      w.delay=RING_END+.5+(w.depth/maxDepth)*FILL_TIME+Math.random()*1.2;
     }
 
-    fWords = ring.concat(inner);
-    fDoneAt = Math.max(...fWords.map(w => w.delay)) + 1;
+    fWords=ring.concat(inner);
+    fDoneAt=Math.max(...fWords.map(w=>w.delay))+1;
   }
 
   function frameFinale(now) {
-    const t = (now - fStart) / 1000;
-    const { cw, ch, dpr, css } = fDim;
+    const t=(now-fStart)/1000;
+    const {cw,ch,dpr,css}=fDim;
 
-    // Finished phrases are painted once onto the still layer
     for (const w of fWords) {
-      if (w.baked || t - w.delay < 0.7) continue;
-      fsx.setTransform(dpr * w.cs, dpr * w.sn, -dpr * w.sn, dpr * w.cs, dpr * (cw / 2 + w.x), dpr * (ch / 2 - w.y));
-      fsx.globalAlpha = w.alpha;
-      fsx.fillStyle = w.color;
-      fsx.fillText(w.text, 0, 0);
-      w.baked = true;
+      if (w.baked||t-w.delay<.7) continue;
+      fsx.setTransform(
+        dpr*w.cs,dpr*w.sn,-dpr*w.sn,dpr*w.cs,
+        dpr*(cw/2+w.x),dpr*(ch/2-w.y)
+      );
+      fsx.globalAlpha=w.alpha;
+      fsx.fillStyle=w.color;
+      fsx.fillText(w.text,0,0);
+      w.baked=true;
     }
 
-    fx.globalAlpha = 1;
-    fx.shadowBlur = 0;
-    fx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    fx.fillStyle = "#000";
-    fx.fillRect(0, 0, cw, ch);
+    fx.globalAlpha=1;
+    fx.shadowBlur=0;
+    fx.setTransform(dpr,0,0,dpr,0,0);
+    fx.fillStyle="#000";
+    fx.fillRect(0,0,cw,ch);
 
-    // gentle heartbeat once the heart is complete
-    const beat = REDUCED || t < fDoneAt ? 1 : 1 + 0.025 * Math.pow(Math.sin((t - fDoneAt) * 3.5), 2);
-    fx.setTransform(beat, 0, 0, beat, (1 - beat) * cw * dpr / 2, (1 - beat) * ch * dpr / 2);
-    fx.drawImage(fStatic, 0, 0);
+    const beat=REDUCED||t<fDoneAt?1:1+.025*Math.pow(Math.sin((t-fDoneAt)*3.5),2);
+    fx.setTransform(beat,0,0,beat,(1-beat)*cw*dpr/2,(1-beat)*ch*dpr/2);
+    fx.drawImage(fStatic,0,0);
 
-    fx.font = css;
-    fx.textAlign = "center";
-    fx.textBaseline = "middle";
+    fx.font=css;
+    fx.textAlign="center";
+    fx.textBaseline="middle";
 
-    // Only phrases that are popping in, or sparkling right now, are drawn again
     for (const w of fWords) {
-      const age = t - w.delay;
-      if (age <= 0) continue;
-      let tw = 0;
-      if (!REDUCED && age > 0.8) tw = Math.pow(Math.max(0, Math.sin(t * w.speed + w.phase)), SPARKLE_POWER);
-      if (w.baked && tw <= 0.02) continue;
-      if (tw > 0.93 && now - fTwinkle > 450) { fTwinkle = now; snd.twinkle(); }
-
-      const q = Math.min(1, age / 0.6);
-      const pop = (REDUCED ? 1 : 1 + 2.70158 * Math.pow(q - 1, 3) + 1.70158 * Math.pow(q - 1, 2)) * beat;
-      const sc = pop * (1 + 0.12 * tw);
-      const cs = w.cs * sc, sn = w.sn * sc;
-      fx.setTransform(dpr * cs, dpr * sn, -dpr * sn, dpr * cs, dpr * (cw / 2 + w.x * beat), dpr * (ch / 2 - w.y * beat));
-      fx.globalAlpha = tw > 0.02 ? 1 : Math.min(1, q * 1.6) * w.alpha;
-      if (tw > 0.02) {
-        const base = hexRgb(w.color);
-        const c = base.map((v, i) => Math.round(v + (SPARKLE_RGB[i] - v) * tw));
-        fx.fillStyle = "rgb(" + c[0] + "," + c[1] + "," + c[2] + ")";
-        fx.shadowColor = "rgba(255, 190, 215, .9)";
-        fx.shadowBlur = 12 * tw;
-      } else {
-        fx.fillStyle = w.color;
-        fx.shadowBlur = 0;
+      const age=t-w.delay;
+      if (age<=0) continue;
+      let tw=0;
+      if (!REDUCED&&age>.8) tw=Math.pow(Math.max(0,Math.sin(t*w.speed+w.phase)),SPARKLE_POWER);
+      if (w.baked&&tw<=.02) continue;
+      if (tw>.93&&now-fTwinkle>450) {
+        fTwinkle=now;
+        snd.twinkle();
       }
-      fx.fillText(w.text, 0, 0);
+
+      const q=Math.min(1,age/.6);
+      const pop=(REDUCED?1:1+2.70158*Math.pow(q-1,3)+1.70158*Math.pow(q-1,2))*beat;
+      const sc=pop*(1+.12*tw);
+      const cs=w.cs*sc,sn=w.sn*sc;
+
+      fx.setTransform(
+        dpr*cs,dpr*sn,-dpr*sn,dpr*cs,
+        dpr*(cw/2+w.x*beat),dpr*(ch/2-w.y*beat)
+      );
+      fx.globalAlpha=tw>.02?1:Math.min(1,q*1.6)*w.alpha;
+
+      if (tw>.02) {
+        const base=hexRgb(w.color);
+        const c=base.map((v,i)=>Math.round(v+(SPARKLE_RGB[i]-v)*tw));
+        fx.fillStyle="rgb("+c[0]+","+c[1]+","+c[2]+")";
+        fx.shadowColor="rgba(255, 190, 215, .9)";
+        fx.shadowBlur=12*tw;
+      } else {
+        fx.fillStyle=w.color;
+        fx.shadowBlur=0;
+      }
+      fx.fillText(w.text,0,0);
     }
-    fx.shadowBlur = 0;
-    fRaf = requestAnimationFrame(frameFinale);
+
+    fx.shadowBlur=0;
+    fRaf=requestAnimationFrame(frameFinale);
   }
 
   function startFinale() {
     cancelAnimationFrame(fRaf);
     layoutFinale();
-    fStart = performance.now();
-    fRaf = requestAnimationFrame(frameFinale);
+    fStart=performance.now();
+    fRaf=requestAnimationFrame(frameFinale);
   }
 
-  addEventListener("resize", () => { if (finale.classList.contains("show")) layoutFinale(); });
+  addEventListener("resize",()=>{
+    if (finale.classList.contains("show")) layoutFinale();
+  });
 
-  document.getElementById("finaleBtn").addEventListener("click", () => {
+  document.getElementById("finaleBtn").addEventListener("click",()=>{
     snd.swell();
-    if (LETTER_MUSIC_FILE) snd.music("letter", 2);
+    if (LETTER_MUSIC_FILE) snd.music("letter",2);
     letter.classList.remove("show");
     finale.classList.add("show");
     startFinale();
   });
 
   // Floating hearts behind the letter
-  for (let i = 0; i < 16; i++) {
-    const h = document.createElement("span");
-    h.className = "bg-heart";
-    h.textContent = "\u2665";
-    h.style.left = Math.random() * 100 + "vw";
-    h.style.fontSize = 14 + Math.random() * 26 + "px";
-    h.style.animationDuration = 7 + Math.random() * 7 + "s";
-    h.style.animationDelay = Math.random() * 8 + "s";
+  for (let i=0;i<16;i++) {
+    const h=document.createElement("span");
+    h.className="bg-heart";
+    h.textContent="\u2665";
+    h.style.left=Math.random()*100+"vw";
+    h.style.fontSize=14+Math.random()*26+"px";
+    h.style.animationDuration=7+Math.random()*7+"s";
+    h.style.animationDelay=Math.random()*8+"s";
     letter.appendChild(h);
   }
 
   // ---------- Particles ----------
-  const SPARKS = ["#ffd54a", "#ffffff", "#ffb347"];
-  const PINKS = ["#ff2d6f", "#ff5c8a", "#ff8fb1", "#ffc2d6", "#ffffff"];
-  function burst(x, y, n, ch, colors, speed, size) {
-    for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, v = (0.3 + Math.random()) * speed;
+  const SPARKS=["#ffd54a","#ffffff","#ffb347"];
+  const PINKS=["#ff2d6f","#ff5c8a","#ff8fb1","#ffc2d6","#ffffff"];
+
+  function burst(x,y,n,ch,colors,speed,size) {
+    for (let i=0;i<n;i++) {
+      const a=Math.random()*Math.PI*2,v=(.3+Math.random())*speed;
       parts.push({
-        x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - speed * 0.3,
-        life: 1, decay: 0.5 + Math.random() * 0.6,
-        size: size * (0.6 + Math.random() * 0.8), ch,
-        color: colors[(Math.random() * colors.length) | 0]
+        x,y,
+        vx:Math.cos(a)*v,
+        vy:Math.sin(a)*v-speed*.3,
+        life:1,
+        decay:.5+Math.random()*.6,
+        size:size*(.6+Math.random()*.8),
+        ch,
+        color:colors[(Math.random()*colors.length)|0]
       });
     }
   }
@@ -932,402 +1091,528 @@
   // ---------- Hit handling ----------
   function onHit(a) {
     hits++;
-    target.pulse = 1;
-    stuck.push({ ox: a.x - TARGET_X, oy: a.y - target.y, angle: a.angle, life: 2.5 });
-    burst(a.x, a.y, 10, "\u2022", SPARKS, 220, 20);
+    target.pulse=1;
+    stuck.push({
+      ox:a.x-TARGET_X,
+      oy:a.y-target.y,
+      angle:a.angle,
+      life:2.5
+    });
+    burst(a.x,a.y,10,"\u2022",SPARKS,220,20);
     snd.hit(hits);
-    if (hits >= HITS_NEEDED) {
-      state = "won";
+
+    if (hits>=HITS_NEEDED) {
+      state="won";
       snd.tension();
-      snd.music("off", 0.15);
-      target.moving = false;
-      cracks = Array.from({ length: 11 }, (_, i) => ({
-        a: (i / 11) * Math.PI * 2 + Math.random() * 0.4,
-        len: 160 + Math.random() * 380,
-        kink: (Math.random() - 0.5) * 40
+      snd.music("off",.15);
+      target.moving=false;
+      cracks=Array.from({length:11},(_,i)=>({
+        a:(i/11)*Math.PI*2+Math.random()*.4,
+        len:160+Math.random()*380,
+        kink:(Math.random()-.5)*40
       }));
     }
   }
 
-  // A miss costs one point (the score never goes below 0)
-  function onMiss(x, y) {
-    if (state !== "play") return;
-    const lost = hits > 0;
+  function onMiss(x,y) {
+    if (state!=="play") return;
+    const lost=hits>0;
     if (lost) hits--;
-    missFlash = 1;
+    missFlash=1;
     snd.miss(lost);
     floaters.push({
-      text: lost ? "Miss  \u22121" : "Miss",
-      x: clamp(x, 70, W - 70),
-      y: clamp(y, 70, GROUND - 24),
-      life: 1.2
+      text:lost?"Miss  \u22121":"Miss",
+      x:clamp(x,70,W-70),
+      y:clamp(y,70,GROUND-24),
+      life:1.2
     });
   }
 
   // ---------- Update ----------
   function update(dt) {
-    // The moment hangs: everything freezes right after the last hit
-    if (state === "won" && !shattered && winT < 0.5) { winT += dt; return; }
-    time += dt;
-    for (const c of clouds) { c.x += c.v * dt; if (c.x > W + 120) c.x = -120; }
-    if (target.moving) target.y = 250 + 135 * Math.sin(time * 1.15);
-    target.pulse = Math.max(0, target.pulse - dt * 3);
-    missFlash = Math.max(0, missFlash - dt * 2.5);
-    for (const f of floaters) { f.y -= 40 * dt; f.life -= dt; }
-    floaters = floaters.filter(f => f.life > 0);
+    if (state==="won"&&!shattered&&winT<.5) {
+      winT+=dt;
+      return;
+    }
 
-    for (let i = arrows.length - 1; i >= 0; i--) {
-      const a = arrows[i];
-      let removed = false;
-      const N = 4, h = dt / N;
-      for (let k = 0; k < N && !removed; k++) {
-        a.vy += GRAVITY * h;
-        a.x += a.vx * h;
-        a.y += a.vy * h;
-        a.angle = Math.atan2(a.vy, a.vx);
-        if (state === "play" && Math.hypot(a.x - TARGET_X, a.y - target.y) < TARGET_R) {
-          onHit(a); removed = true;
-        } else if (a.y >= GROUND) {
-          groundArrows.push({ x: a.x, y: GROUND, angle: a.angle, life: 2 });
-          burst(a.x, GROUND, 6, "\u2022", ["#6b4a2b", "#3f7a2a"], 120, 16);
-          onMiss(a.x, GROUND);
-          removed = true;
+    time+=dt;
+    for (const c of clouds) {
+      c.x+=c.v*dt;
+      if (c.x>W+120) c.x=-120;
+    }
+
+    if (target.moving) target.y=250+135*Math.sin(time*1.15);
+    target.pulse=Math.max(0,target.pulse-dt*3);
+    missFlash=Math.max(0,missFlash-dt*2.5);
+
+    for (const f of floaters) {
+      f.y-=40*dt;
+      f.life-=dt;
+    }
+    floaters=floaters.filter(f=>f.life>0);
+
+    for (let i=arrows.length-1;i>=0;i--) {
+      const a=arrows[i];
+      let removed=false;
+      const N=4,h=dt/N;
+
+      for (let k=0;k<N&&!removed;k++) {
+        a.vy+=GRAVITY*h;
+        a.x+=a.vx*h;
+        a.y+=a.vy*h;
+        a.angle=Math.atan2(a.vy,a.vx);
+
+        if (state==="play"&&Math.hypot(a.x-TARGET_X,a.y-target.y)<TARGET_R) {
+          onHit(a);
+          removed=true;
+        } else if (a.y>=GROUND) {
+          groundArrows.push({x:a.x,y:GROUND,angle:a.angle,life:2});
+          burst(a.x,GROUND,6,"\u2022",["#6b4a2b","#3f7a2a"],120,16);
+          onMiss(a.x,GROUND);
+          removed=true;
         }
       }
-      if (!removed && (a.x > W + 80 || a.x < -80)) {
-        onMiss(a.x, a.y);
-        removed = true;
+
+      if (!removed&&(a.x>W+80||a.x< -80)) {
+        onMiss(a.x,a.y);
+        removed=true;
       }
-      if (removed) arrows.splice(i, 1);
+      if (removed) arrows.splice(i,1);
     }
 
-    for (const s of stuck) s.life -= dt;
-    stuck = stuck.filter(s => s.life > 0 || state === "won");
-    for (const g of groundArrows) g.life -= dt;
-    groundArrows = groundArrows.filter(g => g.life > 0);
+    for (const s of stuck) s.life-=dt;
+    stuck=stuck.filter(s=>s.life>0||state==="won");
+
+    for (const g of groundArrows) g.life-=dt;
+    groundArrows=groundArrows.filter(g=>g.life>0);
 
     for (const p of parts) {
-      p.vy += 500 * dt; p.x += p.vx * dt; p.y += p.vy * dt; p.life -= p.decay * dt;
+      p.vy+=500*dt;
+      p.x+=p.vx*dt;
+      p.y+=p.vy*dt;
+      p.life-=p.decay*dt;
     }
-    parts = parts.filter(p => p.life > 0 && p.y < H + 40);
+    parts=parts.filter(p=>p.life>0&&p.y<H+40);
 
-    // Transition: after the last hit
-    if (state === "won") {
-      winT += dt;
-      if (shattered && winT > 0.7 && Math.random() < dt * 14) {
-        rise.push({ x: Math.random() * W, y: H + 20, vy: -(60 + Math.random() * 90),
-                    size: 14 + Math.random() * 26, a: Math.random() * 6.28 });
+    if (state==="won") {
+      winT+=dt;
+      if (shattered&&winT>.7&&Math.random()<dt*14) {
+        rise.push({
+          x:Math.random()*W,
+          y:H+20,
+          vy:-(60+Math.random()*90),
+          size:14+Math.random()*26,
+          a:Math.random()*6.28
+        });
       }
-      if (shattered && winT > 2.8 && !popupShown) { popupShown = true; popup.classList.add("show"); snd.pop(); }
+      if (shattered&&winT>2.8&&!popupShown) {
+        popupShown=true;
+        popup.classList.add("show");
+        snd.pop();
+      }
     }
-    for (const r of rise) { r.y += r.vy * dt; r.x += Math.sin(time * 2 + r.a) * 0.5; }
-    rise = rise.filter(r => r.y > -40);
+
+    for (const r of rise) {
+      r.y+=r.vy*dt;
+      r.x+=Math.sin(time*2+r.a)*.5;
+    }
+    rise=rise.filter(r=>r.y>-40);
 
     for (const t of tiles) {
-      t.age += dt;
-      if (t.age < t.delay) continue;
-      t.vy += 1500 * dt;
-      t.x += t.vx * dt;
-      t.y += t.vy * dt;
-      t.rot += t.vr * dt;
+      t.age+=dt;
+      if (t.age<t.delay) continue;
+      t.vy+=1500*dt;
+      t.x+=t.vx*dt;
+      t.y+=t.vy*dt;
+      t.rot+=t.vr*dt;
     }
-    tiles = tiles.filter(t => t.y < H + 150);
+    tiles=tiles.filter(t=>t.y<H+150);
   }
 
-  // Break the frozen picture into shards that fly away from the impact
+  // ---------- Shatter transition ----------
   function startShatter() {
-    snap = document.createElement("canvas");
-    snap.width = cv.width;
-    snap.height = cv.height;
-    snap.getContext("2d").drawImage(cv, 0, 0);
-    const COLS = 12, ROWS = 7, tw = W / COLS, th = H / ROWS;
-    for (let r = 0; r < ROWS; r++) {
-      for (let c = 0; c < COLS; c++) {
-        const cx = c * tw + tw / 2, cy = r * th + th / 2;
-        const dx = cx - TARGET_X, dy = cy - target.y;
-        const d = Math.hypot(dx, dy) || 1;
-        const v = 250 + Math.random() * 350;
+    snap=document.createElement("canvas");
+    snap.width=cv.width;
+    snap.height=cv.height;
+    snap.getContext("2d").drawImage(cv,0,0);
+
+    const COLS=12,ROWS=7,tw=W/COLS,th=H/ROWS;
+
+    for (let r=0;r<ROWS;r++) {
+      for (let c=0;c<COLS;c++) {
+        const cx=c*tw+tw/2,cy=r*th+th/2;
+        const dx=cx-TARGET_X,dy=cy-target.y;
+        const d=Math.hypot(dx,dy)||1;
+        const v=250+Math.random()*350;
+
         tiles.push({
-          sx: c * tw, sy: r * th, w: tw, h: th, x: cx, y: cy,
-          vx: dx / d * v, vy: dy / d * v - 280,
-          rot: 0, vr: (Math.random() - 0.5) * 5,
-          age: 0, delay: d / 1800
+          sx:c*tw,sy:r*th,w:tw,h:th,x:cx,y:cy,
+          vx:dx/d*v,vy:dy/d*v-280,
+          rot:0,vr:(Math.random()-.5)*5,
+          age:0,delay:d/1800
         });
       }
     }
-    shattered = true;
-    burst(TARGET_X, target.y, 60, "\u2665", PINKS, 650, 30);
+
+    shattered=true;
+    burst(TARGET_X,target.y,60,"\u2665",PINKS,650,30);
     snd.shatter();
-    snd.music("love", 2.5);
+    snd.music("love",2.5);
   }
 
-  // ---------- Drawing: shared pieces ----------
-  function drawArrow(x, y, angle, len, alpha) {
+  // ---------- Drawing ----------
+  function drawArrow(x,y,angle,len,alpha) {
     ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.translate(x, y);
+    ctx.globalAlpha=alpha;
+    ctx.translate(x,y);
     ctx.rotate(angle);
-    ctx.strokeStyle = "#8b5a2b";
-    ctx.lineWidth = 3;
-    ctx.beginPath(); ctx.moveTo(-len, 0); ctx.lineTo(-4, 0); ctx.stroke();
-    ctx.fillStyle = "#8d949b";
-    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-12, -5); ctx.lineTo(-12, 5); ctx.closePath(); ctx.fill();
-    ctx.strokeStyle = "#d33";
-    ctx.lineWidth = 2;
-    for (const d of [0, 7, 14]) {
-      ctx.beginPath(); ctx.moveTo(-len + d, 0); ctx.lineTo(-len + d - 7, -6); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(-len + d, 0); ctx.lineTo(-len + d - 7, 6); ctx.stroke();
+    ctx.strokeStyle="#8b5a2b";
+    ctx.lineWidth=3;
+    ctx.beginPath();
+    ctx.moveTo(-len,0);
+    ctx.lineTo(-4,0);
+    ctx.stroke();
+
+    ctx.fillStyle="#8d949b";
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(-12,-5);
+    ctx.lineTo(-12,5);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle="#d33";
+    ctx.lineWidth=2;
+    for (const d of [0,7,14]) {
+      ctx.beginPath();
+      ctx.moveTo(-len+d,0);
+      ctx.lineTo(-len+d-7,-6);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(-len+d,0);
+      ctx.lineTo(-len+d-7,6);
+      ctx.stroke();
     }
     ctx.restore();
   }
 
   function drawBow(angle) {
     ctx.save();
-    ctx.translate(BOW.x, BOW.y);
+    ctx.translate(BOW.x,BOW.y);
     ctx.rotate(angle);
-    const cx = -20, R = 58, lim = 1.0;
-    const e1 = [cx + R * Math.cos(-lim), R * Math.sin(-lim)];
-    const e2 = [cx + R * Math.cos(lim),  R * Math.sin(lim)];
-    const pull = state === "play" ? 16 : 0;
-    ctx.strokeStyle = "#7a4a1e";
-    ctx.lineWidth = 6;
-    ctx.lineCap = "round";
-    ctx.beginPath(); ctx.arc(cx, 0, R, -lim, lim); ctx.stroke();
-    ctx.strokeStyle = "#f4f4f4";
-    ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.moveTo(e1[0], e1[1]); ctx.lineTo(-pull, 0); ctx.lineTo(e2[0], e2[1]); ctx.stroke();
+
+    const cx=-20,R=58,lim=1;
+    const e1=[cx+R*Math.cos(-lim),R*Math.sin(-lim)];
+    const e2=[cx+R*Math.cos(lim),R*Math.sin(lim)];
+    const pull=state==="play"?16:0;
+
+    ctx.strokeStyle="#7a4a1e";
+    ctx.lineWidth=6;
+    ctx.lineCap="round";
+    ctx.beginPath();
+    ctx.arc(cx,0,R,-lim,lim);
+    ctx.stroke();
+
+    ctx.strokeStyle="#f4f4f4";
+    ctx.lineWidth=1.5;
+    ctx.beginPath();
+    ctx.moveTo(e1[0],e1[1]);
+    ctx.lineTo(-pull,0);
+    ctx.lineTo(e2[0],e2[1]);
+    ctx.stroke();
     ctx.restore();
-    if (state === "play") {
-      const nx = BOW.x - Math.cos(angle) * 16, ny = BOW.y - Math.sin(angle) * 16;
-      drawArrow(nx + Math.cos(angle) * 66, ny + Math.sin(angle) * 66, angle, 66, 1);
+
+    if (state==="play") {
+      const nx=BOW.x-Math.cos(angle)*16;
+      const ny=BOW.y-Math.sin(angle)*16;
+      drawArrow(nx+Math.cos(angle)*66,ny+Math.sin(angle)*66,angle,66,1);
     }
-    ctx.fillStyle = "#6b4a2b";
-    ctx.fillRect(BOW.x - 6, BOW.y + 52, 12, GROUND - BOW.y - 52);
+
+    ctx.fillStyle="#6b4a2b";
+    ctx.fillRect(BOW.x-6,BOW.y+52,12,GROUND-BOW.y-52);
   }
 
   function drawTrajectory() {
-    const { angle, power } = aimInfo();
-    let x = BOW.x + Math.cos(angle) * 50, y = BOW.y + Math.sin(angle) * 50;
-    let vx = Math.cos(angle) * power, vy = Math.sin(angle) * power;
-    const step = 0.045;
-    for (let i = 0; i < 26; i++) {
-      vy += GRAVITY * step; x += vx * step; y += vy * step;
-      if (y > GROUND || x > W) break;
-      ctx.globalAlpha = 0.7 * (1 - i / 26);
-      ctx.fillStyle = "#fff";
-      ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
+    const {angle,power}=aimInfo();
+    let x=BOW.x+Math.cos(angle)*50;
+    let y=BOW.y+Math.sin(angle)*50;
+    let vx=Math.cos(angle)*power;
+    let vy=Math.sin(angle)*power;
+    const step=.045;
+
+    for (let i=0;i<26;i++) {
+      vy+=GRAVITY*step;
+      x+=vx*step;
+      y+=vy*step;
+      if (y>GROUND||x>W) break;
+      ctx.globalAlpha=.7*(1-i/26);
+      ctx.fillStyle="#fff";
+      ctx.beginPath();
+      ctx.arc(x,y,3,0,Math.PI*2);
+      ctx.fill();
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha=1;
   }
 
   function drawTarget() {
-    const x = TARGET_X, y = target.y;
-    const sc = 1 + 0.12 * target.pulse;
-    // rail
-    ctx.fillStyle = "#8a6a3f";
-    ctx.fillRect(x - 4, 55, 8, GROUND - 55);
-    ctx.fillRect(x - 28, GROUND - 6, 56, 8);
+    const x=TARGET_X,y=target.y;
+    const sc=1+.12*target.pulse;
+
+    ctx.fillStyle="#8a6a3f";
+    ctx.fillRect(x-4,55,8,GROUND-55);
+    ctx.fillRect(x-28,GROUND-6,56,8);
+
     ctx.save();
-    ctx.translate(x, y);
-    ctx.scale(sc, sc);
-    const rings = [["#f6f6f6", 42], ["#222", 34], ["#2a7fd4", 26], ["#d92b2b", 18], ["#f4c20d", 9]];
-    for (const [c, r] of rings) {
-      ctx.fillStyle = c;
-      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = 1; ctx.stroke();
+    ctx.translate(x,y);
+    ctx.scale(sc,sc);
+
+    const rings=[
+      ["#f6f6f6",42],
+      ["#222",34],
+      ["#2a7fd4",26],
+      ["#d92b2b",18],
+      ["#f4c20d",9]
+    ];
+
+    for (const [c,r] of rings) {
+      ctx.fillStyle=c;
+      ctx.beginPath();
+      ctx.arc(0,0,r,0,Math.PI*2);
+      ctx.fill();
+      ctx.strokeStyle="rgba(0,0,0,.35)";
+      ctx.lineWidth=1;
+      ctx.stroke();
     }
     ctx.restore();
+
     for (const st of stuck) {
-      drawArrow(x + st.ox, y + st.oy, st.angle, 46, state === "won" ? 1 : Math.min(1, st.life * 2));
+      drawArrow(
+        x+st.ox,y+st.oy,st.angle,46,
+        state==="won"?1:Math.min(1,st.life*2)
+      );
     }
   }
 
   function scoreBox() {
     ctx.beginPath();
-    if (ctx.roundRect) ctx.roundRect(16, 16, 150, 40, 10);
-    else ctx.rect(16, 16, 150, 40);
+    if (ctx.roundRect) ctx.roundRect(16,16,150,40,10);
+    else ctx.rect(16,16,150,40);
   }
 
-  // ---------- Drawing: the normal daytime scene ----------
   function drawNormal() {
-    const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
-    sky.addColorStop(0, "#6ec3f2");
-    sky.addColorStop(1, "#d6f0fb");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
+    const sky=ctx.createLinearGradient(0,0,0,GROUND);
+    sky.addColorStop(0,"#6ec3f2");
+    sky.addColorStop(1,"#d6f0fb");
+    ctx.fillStyle=sky;
+    ctx.fillRect(0,0,W,H);
 
-    ctx.fillStyle = "#fff3a8";                      // sun
-    ctx.beginPath(); ctx.arc(640, 70, 34, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle="#fff3a8";
+    ctx.beginPath();
+    ctx.arc(640,70,34,0,Math.PI*2);
+    ctx.fill();
 
-    ctx.fillStyle = "rgba(255,255,255,.9)";         // clouds
+    ctx.fillStyle="rgba(255,255,255,.9)";
     for (const c of clouds) {
-      for (const [dx, dy, r] of [[0, 0, 26], [28, -10, 32], [58, 0, 24], [30, 8, 28]]) {
-        ctx.beginPath(); ctx.arc(c.x + dx * c.s, c.y + dy * c.s, r * c.s, 0, Math.PI * 2); ctx.fill();
+      for (const [dx,dy,r] of [[0,0,26],[28,-10,32],[58,0,24],[30,8,28]]) {
+        ctx.beginPath();
+        ctx.arc(c.x+dx*c.s,c.y+dy*c.s,r*c.s,0,Math.PI*2);
+        ctx.fill();
       }
     }
 
-    ctx.fillStyle = "#7fb069";                      // far hills
-    ctx.beginPath(); ctx.moveTo(0, GROUND);
-    ctx.bezierCurveTo(150, 330, 300, 330, 450, 400);
-    ctx.bezierCurveTo(600, 340, 780, 340, W, 390);
-    ctx.lineTo(W, GROUND); ctx.closePath(); ctx.fill();
+    ctx.fillStyle="#7fb069";
+    ctx.beginPath();
+    ctx.moveTo(0,GROUND);
+    ctx.bezierCurveTo(150,330,300,330,450,400);
+    ctx.bezierCurveTo(600,340,780,340,W,390);
+    ctx.lineTo(W,GROUND);
+    ctx.closePath();
+    ctx.fill();
 
-    ctx.fillStyle = "#5fa53d";                      // grass
-    ctx.fillRect(0, GROUND, W, H - GROUND);
-    ctx.fillStyle = "#4b8a2e";
-    ctx.fillRect(0, GROUND, W, 5);
+    ctx.fillStyle="#5fa53d";
+    ctx.fillRect(0,GROUND,W,H-GROUND);
+    ctx.fillStyle="#4b8a2e";
+    ctx.fillRect(0,GROUND,W,5);
 
-    for (const g of groundArrows) drawArrow(g.x, g.y + 2, g.angle, 46, Math.min(1, g.life * 2));
-    drawTarget();
-    if (state === "play") drawTrajectory();
-    drawBow(aimInfo().angle);
-    for (const a of arrows) drawArrow(a.x, a.y, a.angle, 46, 1);
-
-    // HUD
-    ctx.fillStyle = "rgba(255,255,255,.85)";
-    scoreBox(); ctx.fill();
-    if (missFlash > 0) {
-      ctx.fillStyle = "rgba(220, 40, 40, " + (0.55 * missFlash) + ")";
-      scoreBox(); ctx.fill();
+    for (const g of groundArrows) {
+      drawArrow(g.x,g.y+2,g.angle,46,Math.min(1,g.life*2));
     }
-    ctx.fillStyle = "#24331f";
-    ctx.font = "bold 20px Georgia, serif";
-    ctx.textAlign = "left";
-    ctx.fillText("Hits: " + hits + " / " + HITS_NEEDED, 30, 43);
+
+    drawTarget();
+    if (state==="play") drawTrajectory();
+    drawBow(aimInfo().angle);
+
+    for (const a of arrows) drawArrow(a.x,a.y,a.angle,46,1);
+
+    ctx.fillStyle="rgba(255,255,255,.85)";
+    scoreBox();
+    ctx.fill();
+
+    if (missFlash>0) {
+      ctx.fillStyle="rgba(220,40,40,"+(.55*missFlash)+")";
+      scoreBox();
+      ctx.fill();
+    }
+
+    ctx.fillStyle="#24331f";
+    ctx.font="bold 20px Georgia, serif";
+    ctx.textAlign="left";
+    ctx.fillText("Hits: "+hits+" / "+HITS_NEEDED,30,43);
 
     for (const f of floaters) {
-      ctx.globalAlpha = Math.min(1, f.life * 1.5);
-      ctx.fillStyle = "#c62828";
-      ctx.font = "bold 26px Georgia, serif";
-      ctx.textAlign = "center";
-      ctx.fillText(f.text, f.x, f.y);
+      ctx.globalAlpha=Math.min(1,f.life*1.5);
+      ctx.fillStyle="#c62828";
+      ctx.font="bold 26px Georgia, serif";
+      ctx.textAlign="center";
+      ctx.fillText(f.text,f.x,f.y);
     }
-    ctx.globalAlpha = 1;
-    if (shots === 0 && state === "play") {
-      ctx.fillStyle = "#24331f";
-      ctx.textAlign = "center";
-      ctx.font = "20px Georgia, serif";
-      ctx.fillText("Move to aim \u00B7 click or tap to shoot", W / 2, 50);
+    ctx.globalAlpha=1;
+
+    if (shots===0&&state==="play") {
+      ctx.fillStyle="#24331f";
+      ctx.textAlign="center";
+      ctx.font="20px Georgia, serif";
+      ctx.fillText("Move to aim · click or tap to shoot",W/2,50);
     }
   }
 
-  // ---------- Drawing: the romantic scene revealed by the transition ----------
   function drawRomantic(pop) {
-    const sky = ctx.createLinearGradient(0, 0, 0, GROUND);
-    sky.addColorStop(0, "#1a0612");
-    sky.addColorStop(1, "#6a1840");
-    ctx.fillStyle = sky;
-    ctx.fillRect(0, 0, W, H);
+    const sky=ctx.createLinearGradient(0,0,0,GROUND);
+    sky.addColorStop(0,"#1a0612");
+    sky.addColorStop(1,"#6a1840");
+    ctx.fillStyle=sky;
+    ctx.fillRect(0,0,W,H);
 
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle="#fff";
     for (const s of stars) {
-      ctx.globalAlpha = 0.4 + 0.3 * Math.sin(time * 2 + s.x);
-      ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha=.4+.3*Math.sin(time*2+s.x);
+      ctx.beginPath();
+      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fill();
     }
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = "#2a0d1e";
-    ctx.fillRect(0, GROUND, W, H - GROUND);
-    ctx.fillStyle = "#ff5c8a";
-    ctx.fillRect(0, GROUND, W, 3);
+    ctx.globalAlpha=1;
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    ctx.fillStyle = "#ff5c8a";
+    ctx.fillStyle="#2a0d1e";
+    ctx.fillRect(0,GROUND,W,H-GROUND);
+    ctx.fillStyle="#ff5c8a";
+    ctx.fillRect(0,GROUND,W,3);
+
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+    ctx.fillStyle="#ff5c8a";
+
     for (const r of rise) {
-      ctx.globalAlpha = 0.75;
-      ctx.font = r.size + "px serif";
-      ctx.fillText("\u2665", r.x, r.y);
+      ctx.globalAlpha=.75;
+      ctx.font=r.size+"px serif";
+      ctx.fillText("\u2665",r.x,r.y);
     }
-    ctx.globalAlpha = 1;
-    ctx.textBaseline = "alphabetic";
 
-    // the target becomes a heart
-    const beat = 1 + 0.08 * Math.sin(time * 8);
+    ctx.globalAlpha=1;
+    ctx.textBaseline="alphabetic";
+
+    const beat=1+.08*Math.sin(time*8);
     ctx.save();
-    ctx.shadowColor = "#ff2d6f";
-    ctx.shadowBlur = 35;
-    const g = ctx.createRadialGradient(TARGET_X - 12, target.y - 14, 4, TARGET_X, target.y, 50);
-    g.addColorStop(0, "#ff8fb1");
-    g.addColorStop(1, "#e0115f");
-    ctx.fillStyle = g;
-    traceHeart(TARGET_X, target.y, 2.3 * beat * pop);
+    ctx.shadowColor="#ff2d6f";
+    ctx.shadowBlur=35;
+
+    const g=ctx.createRadialGradient(TARGET_X-12,target.y-14,4,TARGET_X,target.y,50);
+    g.addColorStop(0,"#ff8fb1");
+    g.addColorStop(1,"#e0115f");
+    ctx.fillStyle=g;
+    traceHeart(TARGET_X,target.y,2.3*beat*pop);
     ctx.fill();
     ctx.restore();
   }
 
   function drawCracks() {
-    const p = clamp(winT / 0.3, 0, 1);
-    ctx.strokeStyle = "rgba(255, 255, 255, .95)";
-    ctx.lineWidth = 2;
-    ctx.lineCap = "round";
+    const p=clamp(winT/.3,0,1);
+    ctx.strokeStyle="rgba(255,255,255,.95)";
+    ctx.lineWidth=2;
+    ctx.lineCap="round";
+
     for (const c of cracks) {
-      const ca = Math.cos(c.a), sa = Math.sin(c.a);
-      const mx = TARGET_X + ca * c.len * 0.5 * p - sa * c.kink;
-      const my = target.y + sa * c.len * 0.5 * p + ca * c.kink;
+      const ca=Math.cos(c.a),sa=Math.sin(c.a);
+      const mx=TARGET_X+ca*c.len*.5*p-sa*c.kink;
+      const my=target.y+sa*c.len*.5*p+ca*c.kink;
+
       ctx.beginPath();
-      ctx.moveTo(TARGET_X, target.y);
-      ctx.lineTo(mx, my);
-      ctx.lineTo(TARGET_X + ca * c.len * p, target.y + sa * c.len * p);
+      ctx.moveTo(TARGET_X,target.y);
+      ctx.lineTo(mx,my);
+      ctx.lineTo(TARGET_X+ca*c.len*p,target.y+sa*c.len*p);
       ctx.stroke();
     }
   }
 
   function draw() {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.setTransform(dpr,0,0,dpr,0,0);
 
     if (!shattered) {
-      // Before the break: the normal game, trembling after the last hit
-      const trigger = state === "won" && winT >= 0.5;
-      const amp = state === "won" && !trigger ? (winT / 0.5) * 7 : 0;
+      const trigger=state==="won"&&winT>=.5;
+      const amp=state==="won"&&!trigger?(winT/.5)*7:0;
+
       ctx.save();
-      if (amp > 0) ctx.translate((Math.random() - 0.5) * amp, (Math.random() - 0.5) * amp);
+      if (amp>0) {
+        ctx.translate((Math.random()-.5)*amp,(Math.random()-.5)*amp);
+      }
+
       drawNormal();
-      if (state === "won") drawCracks();
+      if (state==="won") drawCracks();
       ctx.restore();
+
       if (trigger) startShatter();
     } else {
-      // The break: the picture falls away and the night scene is underneath
-      const q = clamp((winT - 0.5) / 0.7, 0, 1);
-      const pop = 1 + 2.70158 * Math.pow(q - 1, 3) + 1.70158 * Math.pow(q - 1, 2);
+      const q=clamp((winT-.5)/.7,0,1);
+      const pop=1+2.70158*Math.pow(q-1,3)+1.70158*Math.pow(q-1,2);
+
       drawRomantic(pop);
+
       for (const t of tiles) {
         ctx.save();
-        ctx.translate(t.x, t.y);
+        ctx.translate(t.x,t.y);
         ctx.rotate(t.rot);
-        ctx.drawImage(snap, t.sx * dpr, t.sy * dpr, t.w * dpr, t.h * dpr, -t.w / 2, -t.h / 2, t.w, t.h);
-        ctx.strokeStyle = "rgba(255, 255, 255, .35)";
-        ctx.lineWidth = 1;
-        ctx.strokeRect(-t.w / 2, -t.h / 2, t.w, t.h);
+        ctx.drawImage(
+          snap,
+          t.sx*dpr,t.sy*dpr,t.w*dpr,t.h*dpr,
+          -t.w/2,-t.h/2,t.w,t.h
+        );
+        ctx.strokeStyle="rgba(255,255,255,.35)";
+        ctx.lineWidth=1;
+        ctx.strokeRect(-t.w/2,-t.h/2,t.w,t.h);
         ctx.restore();
       }
-      const flash = 1 - (winT - 0.5) / 0.35;
-      if (flash > 0) {
-        ctx.fillStyle = "rgba(255, 255, 255, " + flash + ")";
-        ctx.fillRect(0, 0, W, H);
+
+      const flash=1-(winT-.5)/.35;
+      if (flash>0) {
+        ctx.fillStyle="rgba(255,255,255,"+flash+")";
+        ctx.fillRect(0,0,W,H);
       }
     }
 
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
+    ctx.textAlign="center";
+    ctx.textBaseline="middle";
+
     for (const p of parts) {
-      ctx.globalAlpha = Math.max(0, p.life);
-      ctx.fillStyle = p.color;
-      ctx.font = p.size + "px serif";
-      ctx.fillText(p.ch, p.x, p.y);
+      ctx.globalAlpha=Math.max(0,p.life);
+      ctx.fillStyle=p.color;
+      ctx.font=p.size+"px serif";
+      ctx.fillText(p.ch,p.x,p.y);
     }
-    ctx.globalAlpha = 1;
-    ctx.textBaseline = "alphabetic";
+
+    ctx.globalAlpha=1;
+    ctx.textBaseline="alphabetic";
   }
 
   // ---------- Loop ----------
-  let prev = performance.now();
+  let prev=performance.now();
+
   function frame(now) {
-    const dt = Math.min((now - prev) / 1000, 0.033);
-    prev = now;
+    const dt=Math.min((now-prev)/1000,.033);
+    prev=now;
     update(dt);
     draw();
     requestAnimationFrame(frame);
   }
+
   requestAnimationFrame(frame);
 </script>
 </body>
